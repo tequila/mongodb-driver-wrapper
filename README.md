@@ -16,7 +16,7 @@ These cool things are explained below.
 
 ### Your code becomes testable:
 Suppose you are writing a code, that uses MongoDB driver classes to communicate with MongoDB server.
-You need to write tests for you code. Since MongoDB driver has its own tests, 
+You need to write tests for your code. Since MongoDB driver has its own tests, 
 you don't have to repeat them by making real queries to the database.
 What you wanna do, is to write tests for you code, and check that your code makes proper calls to `MongoDB\Driver\Manager` methods,
 since this class is the only entry point to the communication with MongoDB from PHP.
