@@ -1,7 +1,7 @@
 # Tequila PHP MongoDB Driver Wrapper
 
 This library provides a thin wrapper around the new official [PHP MongoDB driver](https://github.com/mongodb/mongo-php-driver).
-It can be helpful for you if: 
+It can be helpful for you: 
 - If you don't want to use high level abstractions around PHP MongoDB Driver, such as 
 [Tequila MongoDB PHP Library](https://github.com/tequila/mongodb-php-lib) or official
 [MongoDB PHP Library](https://github.com/mongodb/mongo-php-library) and you are going to use native driver classes.
