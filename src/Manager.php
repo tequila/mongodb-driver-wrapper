@@ -2,7 +2,6 @@
 
 namespace Tequila\MongoDB;
 
-use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\Command;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
@@ -67,17 +66,15 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function executeBulkWrite($namespace, BulkWriteInterface $bulkWrite, WriteConcern $writeConcern)
+    public function executeBulkWrite($namespace, BulkProviderInterface $bulkProvider, WriteConcern $writeConcern)
     {
-        $driverBulk = new BulkWrite();
-        $insertedIds = $bulkWrite->configureBulk($driverBulk);
         $writeResult = $this->getWrappedManager()->executeBulkWrite(
             $namespace,
-            $driverBulk,
+            $bulkProvider->getBulk(),
             $writeConcern
         );
 
-        $wrappedResult = new WriteResult($writeResult, $insertedIds);
+        $wrappedResult = new WriteResult($writeResult, $bulkProvider->getInsertedIds());
 
         return $wrappedResult;
     }
@@ -92,13 +89,13 @@ class Manager implements ManagerInterface
         }
 
         $server = $this->getWrappedManager()->selectServer($readPreference);
+        $serverInfo = new ServerInfo($server);
 
-        $driverCommand = new Command($command->getOptions($server));
+        $driverCommand = new Command($command->getOptions($serverInfo));
 
-        return $this->getWrappedManager()->executeCommand(
+        return $server->executeCommand(
             $databaseName,
-            $driverCommand,
-            $readPreference
+            $driverCommand
         );
     }
 
@@ -107,9 +104,12 @@ class Manager implements ManagerInterface
      */
     public function executeQuery($namespace, Query $query, ReadPreference $readPreference)
     {
-        $driverQuery = new \MongoDB\Driver\Query($query->getFilter(), $query->getQueryOptions());
+        $server = $this->getWrappedManager()->selectServer($readPreference);
+        $serverInfo = new ServerInfo($server);
 
-        return $this->getWrappedManager()->executeQuery($namespace, $driverQuery, $readPreference);
+        $driverQuery = new \MongoDB\Driver\Query($query->getFilter(), $query->getOptions($serverInfo));
+
+        return $server->executeQuery($namespace, $driverQuery);
     }
 
     /**

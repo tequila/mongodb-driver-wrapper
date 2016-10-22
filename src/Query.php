@@ -2,7 +2,9 @@
 
 namespace Tequila\MongoDB;
 
-class Query
+use Tequila\MongoDB\Exception\UnsupportedException;
+
+class Query implements OptionsAwareInterface
 {
     /**
      * @var object
@@ -12,23 +14,23 @@ class Query
     /**
      * @var array
      */
-    private $queryOptions;
+    private $options;
 
     /**
      * @param array|object $filter
-     * @param array $queryOptions
+     * @param array $options
      */
-    public function __construct($filter, array $queryOptions = [])
+    public function __construct($filter, array $options = [])
     {
         $this->filter = (object)$filter;
-        $this->queryOptions = $queryOptions;
+        $this->options = $options;
     }
 
     public function __debugInfo()
     {
         return [
             'filter' => $this->filter,
-            'queryOptions' => $this->queryOptions,
+            'queryOptions' => $this->options,
         ];
     }
 
@@ -41,10 +43,17 @@ class Query
     }
 
     /**
+     * @param ServerInfo $serverInfo
      * @return array
      */
-    public function getQueryOptions()
+    public function getOptions(ServerInfo $serverInfo)
     {
-        return $this->queryOptions;
+        $wireVersionForCollationOption = 5;
+
+        if (isset($this->options['collation']) && $serverInfo->supportsFeature($wireVersionForCollationOption)) {
+            throw new UnsupportedException('Option "collation" is not supported by the server');
+        }
+
+        return $this->options;
     }
 }
