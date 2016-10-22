@@ -63,7 +63,7 @@ This allows you to call `Tequila\MongoDB\Query::getFilter()` method and check th
 you are expecting to execute. This allows your code to be more testable and stable.
 
 ### Your code becomes more flexible:
-This library is written with the high-level code in mind. Currently, every application needs to have ability to profile,
+This library is written with the high-level code in mind. Currently, every application needs to have an ability to profile,
 what requests are sent to the database server. And the one of the main goals of the profiling tools is to intercept 
 requests to the database at the lowest possible level. Suppose you're using the official [MongoDB PHP Library](https://github.com/mongodb/mongo-php-library).
 To profile the requests, you can extend the `MongoDB\Collection` class and decorate it's calls to the `MongoDB\Driver\Manager`
