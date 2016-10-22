@@ -14,6 +14,22 @@ In case this is not about you - you can try high-level tools, for example
 By wrapping driver classes this library allows you to do some cool things, that could not be done when using just native driver.
 These cool things are explained below.
 
+## Installation
+This library requires PHP 5.6 or higher, PHP 7.0 or higher.
+It may work with the MongoDB 2.4+, but support will be provided for the MongoDB 3.0+.
+Since this library wraps official [PHP MongoDB driver](https://github.com/mongodb/mongo-php-driver), it requires
+this driver to be installed:
+```bash
+$ pecl install mongodb
+```
+
+The library should be installed with [Composer](https://getcomposer.org):
+```bash
+$ composer require tequila/mongodb-driver-wrapper
+```
+
+## Why to use this library
+
 ### Your code becomes testable:
 Suppose you are writing a code, that uses MongoDB driver classes to communicate with MongoDB server.
 You need to write tests for your code. Since MongoDB driver has its own tests, 
