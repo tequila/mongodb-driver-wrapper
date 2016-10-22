@@ -64,7 +64,7 @@ you are expecting to execute. This allows your code to be more testable and stab
 
 ### Your code becomes more flexible:
 This library is written with the high-level code in mind. Currently, every application needs to have an ability to profile,
-what requests are sent to the database server. And the one of the main goals of the profiling tools is to intercept 
+what requests are sent to the database server. And one of the main goals of the profiling tools is to intercept 
 requests to the database at the lowest possible level. Suppose you're using the official [MongoDB PHP Library](https://github.com/mongodb/mongo-php-library).
 To profile the requests, you can extend the `MongoDB\Collection` class and decorate it's calls to the `MongoDB\Driver\Manager`
 instance like so:
@@ -110,7 +110,7 @@ to the format, acceptable by the `FindAndModify` command, and `FindAndModify` co
 to the format, acceptable by the MongoDB server. As a result - your profiler will save just input options of the command,
 and you will not know, what request has been actually sent to the MongoDB server.
 
-Off course, you can decorate every single command or to write your own commands. But it doesn't make sense to use the library,
+Off course, you can decorate every single command or write your own commands. But it doesn't make sense to use the library,
 if you need to write everything by yourself. It's too hard and it leads to bugs: if you change your profiler, you must
 fix it's usages in every single command.
 Therefore, the best solution is to have ability to add your logic right before the request is sent to the database.
