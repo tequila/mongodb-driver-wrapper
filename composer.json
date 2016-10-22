@@ -1,7 +1,7 @@
 {
     "name": "tequila/mongodb-driver-wrapper",
     "description": "Wraps MongoDB driver classes to have access to their internals",
-    "keywords": ["mongodb", "driver", "database", "php", "php7"],
+    "keywords": ["mongodb", "driver", "database", "php", "php7", "hhvm"],
     "type": "library",
     "require": {
         "php": ">=5.6",
