@@ -126,6 +126,7 @@ namespace MyApplication;
 use MongoDB\Driver\ReadPreference;
 use Tequila\MongoDB\Manager;
 use Tequila\MongoDB\CommandInterface;
+use Tequila\MongoDB\ServerInfo;
 
 class ProfilerAwareManager extends Manager
 {
@@ -138,7 +139,9 @@ class ProfilerAwareManager extends Manager
     
     public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference)
     {
-        $profilerEntry = $command->getOptions();
+        $server = $this->selectServer($readPreference);
+        $serverInfo = new ServerInfo($server);
+        $profilerEntry = $command->getOptions($serverInfo);
         $response = parent::executeCommand($databaseName, $command, $readPreference);
         
         $profilerEntry['response'] = $response;

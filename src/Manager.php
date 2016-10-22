@@ -88,7 +88,7 @@ class Manager implements ManagerInterface
             $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
         }
 
-        $server = $this->getWrappedManager()->selectServer($readPreference);
+        $server = $this->selectServer($readPreference);
         $serverInfo = new ServerInfo($server);
 
         $driverCommand = new Command($command->getOptions($serverInfo));
