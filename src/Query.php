@@ -50,7 +50,7 @@ class Query implements OptionsAwareInterface
     {
         $wireVersionForCollationOption = 5;
 
-        if (isset($this->options['collation']) && $serverInfo->supportsFeature($wireVersionForCollationOption)) {
+        if (isset($this->options['collation']) && !$serverInfo->supportsFeature($wireVersionForCollationOption)) {
             throw new UnsupportedException('Option "collation" is not supported by the server');
         }
 
