@@ -11,6 +11,9 @@ class ServerInfo
      */
     private $info;
 
+    /**
+     * @param Server $server
+     */
     public function __construct(Server $server)
     {
         $this->info = $server->getInfo();

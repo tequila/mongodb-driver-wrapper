@@ -2,7 +2,7 @@
 
 namespace Tequila\MongoDB;
 
-class Query
+class Query implements QueryInterface
 {
     /**
      * @var object
@@ -41,9 +41,10 @@ class Query
     }
 
     /**
+     * @param ServerInfo $serverInfo
      * @return array
      */
-    public function getOptions()
+    public function getOptions(ServerInfo $serverInfo)
     {
         return $this->options;
     }

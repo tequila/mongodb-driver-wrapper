@@ -30,6 +30,15 @@ class BulkWrite implements BulkProviderInterface
         $this->wrappedBulk = new \MongoDB\Driver\BulkWrite($options);
     }
 
+    public function __debugInfo()
+    {
+        return [
+            'count' => $this->count,
+            'insertedIds' => $this->insertedIds,
+            'wrappedBulk' => $this->wrappedBulk,
+        ];
+    }
+
     /**
      * @inheritdoc
      */

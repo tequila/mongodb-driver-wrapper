@@ -25,11 +25,11 @@ interface ManagerInterface
 
     /**
      * @param $namespace
-     * @param Query $query
+     * @param QueryInterface $query
      * @param ReadPreference $readPreference
      * @return \MongoDB\Driver\Cursor
      */
-    public function executeQuery($namespace, Query $query, ReadPreference $readPreference);
+    public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference);
 
     /**
      * @return ReadPreference

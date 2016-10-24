@@ -2,7 +2,7 @@
 
 namespace Tequila\MongoDB;
 
-interface OptionsAwareInterface
+interface OptionsProviderInterface
 {
     /**
      * @param ServerInfo $serverInfo is passed for instance to resolve it's options depending on server version

@@ -102,10 +102,14 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function executeQuery($namespace, Query $query, ReadPreference $readPreference)
+    public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference)
     {
-        $server = $this->getWrappedManager()->selectServer($readPreference);
-        $driverQuery = new \MongoDB\Driver\Query($query->getFilter(), $query->getOptions());
+        $server = $this->selectServer($readPreference);
+        $serverInfo = new ServerInfo($server);
+        $driverQuery = new \MongoDB\Driver\Query(
+            $query->getFilter(),
+            $query->getOptions($serverInfo)
+        );
 
         return $server->executeQuery($namespace, $driverQuery);
     }
