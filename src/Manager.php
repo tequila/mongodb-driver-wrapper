@@ -117,6 +117,14 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
+    public function getReadConcern()
+    {
+        return $this->getWrappedManager()->getReadConcern();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getReadPreference()
     {
         return $this->getWrappedManager()->getReadPreference();

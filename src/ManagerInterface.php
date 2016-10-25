@@ -2,6 +2,7 @@
 
 namespace Tequila\MongoDB;
 
+use MongoDB\Driver\ReadConcern;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 
@@ -30,6 +31,11 @@ interface ManagerInterface
      * @return \MongoDB\Driver\Cursor
      */
     public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference);
+
+    /**
+     * @return ReadConcern
+     */
+    public function getReadConcern();
 
     /**
      * @return ReadPreference
