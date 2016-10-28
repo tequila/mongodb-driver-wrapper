@@ -84,7 +84,7 @@ class Manager implements ManagerInterface
      */
     public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference = null)
     {
-        if ($command->needsPrimaryServer() && ReadPreference::RP_PRIMARY !== $readPreference->getMode()) {
+        if ($command->needsPrimaryServer()) {
             $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
         }
 
