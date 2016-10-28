@@ -14,7 +14,7 @@ interface ManagerInterface
      * @param WriteConcern $writeConcern
      * @return WriteResult
      */
-    public function executeBulkWrite($namespace, BulkProviderInterface $bulkWrite, WriteConcern $writeConcern);
+    public function executeBulkWrite($namespace, BulkProviderInterface $bulkWrite, WriteConcern $writeConcern = null);
 
     /**
      * @param string $databaseName
@@ -22,7 +22,7 @@ interface ManagerInterface
      * @param ReadPreference $readPreference
      * @return \MongoDB\Driver\Cursor
      */
-    public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference);
+    public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference = null);
 
     /**
      * @param $namespace
@@ -30,7 +30,7 @@ interface ManagerInterface
      * @param ReadPreference $readPreference
      * @return \MongoDB\Driver\Cursor
      */
-    public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference);
+    public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference = null);
 
     /**
      * @return ReadConcern

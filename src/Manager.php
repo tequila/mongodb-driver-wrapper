@@ -66,7 +66,7 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function executeBulkWrite($namespace, BulkProviderInterface $bulkProvider, WriteConcern $writeConcern)
+    public function executeBulkWrite($namespace, BulkProviderInterface $bulkProvider, WriteConcern $writeConcern = null)
     {
         $writeResult = $this->getWrappedManager()->executeBulkWrite(
             $namespace,
@@ -82,7 +82,7 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference)
+    public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference = null)
     {
         if ($command->needsPrimaryServer() && ReadPreference::RP_PRIMARY !== $readPreference->getMode()) {
             $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
@@ -102,7 +102,7 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference)
+    public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference = null)
     {
         $server = $this->selectServer($readPreference);
         $serverInfo = new ServerInfo($server);
