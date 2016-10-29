@@ -56,5 +56,5 @@ interface ManagerInterface
      * @param ReadPreference $readPreference
      * @return \MongoDB\Driver\Server
      */
-    public function selectServer(ReadPreference $readPreference = null);
+    public function selectServer(ReadPreference $readPreference);
 }

@@ -72,6 +72,7 @@ class Manager implements ManagerInterface
      */
     public function executeBulkWrite($namespace, BulkProviderInterface $bulkProvider, WriteConcern $writeConcern = null)
     {
+        $writeConcern = $writeConcern ?: $this->getWriteConcern();
         $writeResult = $this->getWrappedManager()->executeBulkWrite(
             $namespace,
             $bulkProvider->getBulk(),
@@ -88,6 +89,7 @@ class Manager implements ManagerInterface
      */
     public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference = null)
     {
+        $readPreference = $readPreference ?: $this->getReadPreference();
         if ($command->needsPrimaryServer()) {
             $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
         }
@@ -110,6 +112,8 @@ class Manager implements ManagerInterface
      */
     public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference = null)
     {
+        $readPreference = $readPreference ?: $this->getReadPreference();
+
         $server = $this->selectServer($readPreference);
         $serverInfo = new ServerInfo($server);
         $driverQuery = new \MongoDB\Driver\Query(
@@ -157,7 +161,7 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function selectServer(ReadPreference $readPreference = null)
+    public function selectServer(ReadPreference $readPreference)
     {
         return $this->getWrappedManager()->selectServer($readPreference);
     }

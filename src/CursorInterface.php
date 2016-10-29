@@ -2,9 +2,7 @@
 
 namespace Tequila\MongoDB;
 
-use IteratorAggregate;
-
-interface CursorInterface extends IteratorAggregate
+interface CursorInterface extends \Iterator
 {
     /**
      * @return \MongoDB\Driver\CursorId
