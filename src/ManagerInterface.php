@@ -20,7 +20,7 @@ interface ManagerInterface
      * @param string $databaseName
      * @param CommandInterface $command
      * @param ReadPreference $readPreference
-     * @return \MongoDB\Driver\Cursor
+     * @return CursorInterface
      */
     public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference = null);
 
@@ -28,7 +28,7 @@ interface ManagerInterface
      * @param $namespace
      * @param QueryInterface $query
      * @param ReadPreference $readPreference
-     * @return \MongoDB\Driver\Cursor
+     * @return CursorInterface
      */
     public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference = null);
 

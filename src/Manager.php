@@ -97,10 +97,12 @@ class Manager implements ManagerInterface
 
         $driverCommand = new Command($command->getOptions($serverInfo));
 
-        return $server->executeCommand(
+        $cursor = $server->executeCommand(
             $databaseName,
             $driverCommand
         );
+
+        return new Cursor($cursor);
     }
 
     /**
@@ -115,7 +117,9 @@ class Manager implements ManagerInterface
             $query->getOptions($serverInfo)
         );
 
-        return $server->executeQuery($namespace, $driverQuery);
+        $cursor = $server->executeQuery($namespace, $driverQuery);
+
+        return new Cursor($cursor);
     }
 
     /**
