@@ -43,6 +43,10 @@ class Manager implements ManagerInterface
      */
     public function __construct($uri = 'mongodb://127.0.0.1/', array $uriOptions = [], array $driverOptions = [])
     {
+        // Sorting options forces wrapped \MongoDB\Driver\Manager to reuse cached libmongoc connections
+        ksort($uriOptions);
+        ksort($driverOptions);
+
         $this->uri = $uri;
         $this->uriOptions = $uriOptions;
         $this->driverOptions = $driverOptions;
