@@ -7,7 +7,7 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 
 /**
- * This class wraps \MongoDB\Driver\Manager instance
+ * This class wraps \MongoDB\Driver\Manager instance.
  * You can extend this class to have ability to intercept the calls to the driver Manager methods,
  * for example, in order to dispatch events.
  * Also this class can be used to create mocks, when you need to test, what methods of the Manager will be called
@@ -73,12 +73,9 @@ class Manager implements ManagerInterface
     public function executeBulkWrite($namespace, BulkProviderInterface $bulkProvider, WriteConcern $writeConcern = null)
     {
         $writeConcern = $writeConcern ?: $this->getWriteConcern();
-        $writeResult = $this->getWrappedManager()->executeBulkWrite(
-            $namespace,
-            $bulkProvider->getBulk(),
-            $writeConcern
-        );
-
+        $server = $this->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
+        $bulk = $bulkProvider->getBulk(new ServerInfo($server));
+        $writeResult = $server->executeBulkWrite($namespace, $bulk, $writeConcern);
         $wrappedResult = new WriteResult($writeResult, $bulkProvider->getInsertedIds());
 
         return $wrappedResult;
