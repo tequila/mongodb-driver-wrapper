@@ -50,6 +50,11 @@ class Manager implements ManagerInterface
         $this->uri = $uri;
         $this->uriOptions = $uriOptions;
         $this->driverOptions = $driverOptions;
+        $this->wrappedManager = new \MongoDB\Driver\Manager(
+            $this->uri,
+            $this->uriOptions,
+            $this->driverOptions
+        );
     }
 
     /**
@@ -74,7 +79,7 @@ class Manager implements ManagerInterface
     {
         $writeConcern = $writeConcern ?: $this->getWriteConcern();
         $server = $this->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
-        $bulk = $bulkProvider->getBulk(new ServerInfo($server));
+        $bulk = $bulkProvider->getBulk($server);
         $writeResult = $server->executeBulkWrite($namespace, $bulk, $writeConcern);
         $wrappedResult = new WriteResult($writeResult, $bulkProvider->getInsertedIds());
 
@@ -92,9 +97,7 @@ class Manager implements ManagerInterface
         }
 
         $server = $this->selectServer($readPreference);
-        $serverInfo = new ServerInfo($server);
-
-        $driverCommand = new Command($command->getOptions($serverInfo));
+        $driverCommand = new Command($command->getOptions($server));
 
         $cursor = $server->executeCommand(
             $databaseName,
@@ -112,10 +115,9 @@ class Manager implements ManagerInterface
         $readPreference = $readPreference ?: $this->getReadPreference();
 
         $server = $this->selectServer($readPreference);
-        $serverInfo = new ServerInfo($server);
         $driverQuery = new \MongoDB\Driver\Query(
             $query->getFilter(),
-            $query->getOptions($serverInfo)
+            $query->getOptions($server)
         );
 
         $cursor = $server->executeQuery($namespace, $driverQuery);
@@ -128,7 +130,7 @@ class Manager implements ManagerInterface
      */
     public function getReadConcern()
     {
-        return $this->getWrappedManager()->getReadConcern();
+        return $this->wrappedManager->getReadConcern();
     }
 
     /**
@@ -136,7 +138,7 @@ class Manager implements ManagerInterface
      */
     public function getReadPreference()
     {
-        return $this->getWrappedManager()->getReadPreference();
+        return $this->wrappedManager->getReadPreference();
     }
 
     /**
@@ -144,7 +146,7 @@ class Manager implements ManagerInterface
      */
     public function getWriteConcern()
     {
-        return $this->getWrappedManager()->getWriteConcern();
+        return $this->wrappedManager->getWriteConcern();
     }
 
     /**
@@ -152,7 +154,12 @@ class Manager implements ManagerInterface
      */
     public function getServers()
     {
-        return $this->getWrappedManager()->getServers();
+        /** @var array $servers */
+        $servers = $this->wrappedManager->getServers();
+
+        return array_map(function(\MongoDB\Driver\Server $server) {
+            return new Server($server);
+        }, $servers);
     }
 
     /**
@@ -160,22 +167,8 @@ class Manager implements ManagerInterface
      */
     public function selectServer(ReadPreference $readPreference)
     {
-        return $this->getWrappedManager()->selectServer($readPreference);
-    }
+        $server = $this->wrappedManager->selectServer($readPreference);
 
-    /**
-     * @return \MongoDB\Driver\Manager
-     */
-    private function getWrappedManager()
-    {
-        if (null === $this->wrappedManager) {
-            $this->wrappedManager = new \MongoDB\Driver\Manager(
-                $this->uri,
-                $this->uriOptions,
-                $this->driverOptions
-            );
-        }
-
-        return $this->wrappedManager;
+        return new Server($server);
     }
 }

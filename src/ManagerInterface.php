@@ -48,13 +48,13 @@ interface ManagerInterface
     public function getWriteConcern();
 
     /**
-     * @return \MongoDB\Driver\Server[]
+     * @return Server[]
      */
     public function getServers();
 
     /**
      * @param ReadPreference $readPreference
-     * @return \MongoDB\Driver\Server
+     * @return Server
      */
     public function selectServer(ReadPreference $readPreference);
 }

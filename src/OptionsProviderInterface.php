@@ -5,8 +5,8 @@ namespace Tequila\MongoDB;
 interface OptionsProviderInterface
 {
     /**
-     * @param ServerInfo $serverInfo is passed for instance to resolve it's options depending on server version
+     * @param Server $server is passed for instance to resolve it's options depending on server version
      * @return array|object
      */
-    public function getOptions(ServerInfo $serverInfo);
+    public function getOptions(Server $server);
 }

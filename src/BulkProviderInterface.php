@@ -7,10 +7,10 @@ use MongoDB\BSON\ObjectID;
 interface BulkProviderInterface
 {
     /**
-     * @param ServerInfo $serverInfo
+     * @param Server $server
      * @return \MongoDB\Driver\BulkWrite
      */
-    public function getBulk(ServerInfo $serverInfo);
+    public function getBulk(Server $server);
 
     /**
      * @return array|ObjectID[] inserted ids

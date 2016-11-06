@@ -41,10 +41,9 @@ class Query implements QueryInterface
     }
 
     /**
-     * @param ServerInfo $serverInfo
-     * @return array
+     * @inheritdoc
      */
-    public function getOptions(ServerInfo $serverInfo)
+    public function getOptions(Server $server)
     {
         return $this->options;
     }
