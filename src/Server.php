@@ -142,21 +142,21 @@ class Server
      */
     public function isSecondary()
     {
-        return $this->wrappedServer->isArbiter();
+        return $this->wrappedServer->isSecondary();
     }
 
     /**
-     * @param int $featureWireVersion
+     * @param int $wireVersion
      * @return bool
      */
-    public function supportsFeature($featureWireVersion)
+    public function supportsWireVersion($wireVersion)
     {
         $info = $this->getInfo();
-        $featureWireVersion = (int)$featureWireVersion;
+        $wireVersion = (int)$wireVersion;
         $minWireVersion = array_key_exists('minWireVersion', $info) ? $info['minWireVersion'] : 0;
         $maxWireVersion = array_key_exists('maxWireVersion', $info) ? $info['maxWireVersion'] : 0;
 
-        return $featureWireVersion >= $minWireVersion && $featureWireVersion <= $maxWireVersion;
+        return $wireVersion >= $minWireVersion && $wireVersion <= $maxWireVersion;
     }
 
     /**
@@ -164,7 +164,7 @@ class Server
      */
     public function supportsCollation()
     {
-        return $this->supportsFeature(5);
+        return $this->supportsWireVersion(5);
     }
 
     /**
@@ -172,7 +172,7 @@ class Server
      */
     public function supportsDocumentValidation()
     {
-        return $this->supportsFeature(4);
+        return $this->supportsWireVersion(4);
     }
 
     /**
@@ -180,7 +180,7 @@ class Server
      */
     public function supportsReadConcern()
     {
-        return $this->supportsFeature(4);
+        return $this->supportsWireVersion(4);
     }
 
     /**
@@ -188,6 +188,6 @@ class Server
      */
     public function supportsWriteConcern()
     {
-        return $this->supportsFeature(5);
+        return $this->supportsWireVersion(5);
     }
 }

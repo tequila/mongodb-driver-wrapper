@@ -92,10 +92,6 @@ class Manager implements ManagerInterface
     public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference = null)
     {
         $readPreference = $readPreference ?: $this->getReadPreference();
-        if ($command->needsPrimaryServer()) {
-            $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
-        }
-
         $server = $this->selectServer($readPreference);
         $driverCommand = new Command($command->getOptions($server));
 

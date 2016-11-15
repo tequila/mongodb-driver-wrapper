@@ -10,18 +10,11 @@ class Command implements CommandInterface
     private $options;
 
     /**
-     * @var bool
-     */
-    private $needsPrimaryServer;
-
-    /**
      * @param array|object $options
-     * @param bool $needsPrimaryServer Whether this command needs to be executed on a primary server or not
      */
-    public function __construct($options, $needsPrimaryServer)
+    public function __construct($options)
     {
         $this->options = (object)$options;
-        $this->needsPrimaryServer = (bool)$needsPrimaryServer;
     }
 
     /**
@@ -30,13 +23,5 @@ class Command implements CommandInterface
     public function getOptions(Server $server)
     {
         return $this->options;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function needsPrimaryServer()
-    {
-        return $this->needsPrimaryServer();
     }
 }
