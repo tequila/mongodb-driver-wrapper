@@ -2,7 +2,7 @@
 
 namespace Tequila\MongoDB;
 
-class Command implements CommandInterface
+class SimpleCommand implements CommandInterface
 {
     /**
      * @var object options to pass to @see \MongoDB\Driver\Command::__construct()

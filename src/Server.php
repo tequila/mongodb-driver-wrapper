@@ -43,7 +43,7 @@ class Server
      */
     public function executeCommand($databaseName, Command $command, ReadPreference $readPreference = null)
     {
-        return $this->wrappedServer->executeCommand($databaseName, $command, $readPreference);
+        return $this->wrappedServer->executeCommand($databaseName, $command);
     }
 
     /**
@@ -54,7 +54,7 @@ class Server
      */
     public function executeQuery($namespace, Query $query, ReadPreference $readPreference = null)
     {
-        return $this->wrappedServer->executeQuery($namespace, $query, $readPreference);
+        return $this->wrappedServer->executeQuery($namespace, $query);
     }
 
     /**
