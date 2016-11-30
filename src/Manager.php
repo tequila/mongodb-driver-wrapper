@@ -75,13 +75,15 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function executeBulkWrite($namespace, BulkProviderInterface $bulkProvider, WriteConcern $writeConcern = null)
+    public function executeBulkWrite($namespace, BulkCompilerInterface $compiler, WriteConcern $writeConcern = null)
     {
         $writeConcern = $writeConcern ?: $this->getWriteConcern();
         $server = $this->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
-        $bulk = $bulkProvider->getBulk($server);
-        $writeResult = $server->executeBulkWrite($namespace, $bulk, $writeConcern);
-        $wrappedResult = new WriteResult($writeResult, $bulkProvider->getInsertedIds());
+        $options = $compiler->getOptions($server);
+        $bulk = new BulkWrite($options);
+        $compiler->processBulk($bulk, $server);
+        $writeResult = $server->executeBulkWrite($namespace, $bulk->getWrappedBulk(), $writeConcern);
+        $wrappedResult = new WriteResult($writeResult, $bulk->getInsertedIds());
 
         return $wrappedResult;
     }

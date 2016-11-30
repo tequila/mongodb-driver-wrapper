@@ -5,7 +5,7 @@ namespace Tequila\MongoDB;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\Serializable;
 
-class BulkWrite implements BulkProviderInterface
+class BulkWrite
 {
     /**
      * @var int
@@ -40,15 +40,15 @@ class BulkWrite implements BulkProviderInterface
     }
 
     /**
-     * @inheritdoc
+     * @return \MongoDB\Driver\BulkWrite
      */
-    public function getBulk()
+    public function getWrappedBulk()
     {
         return $this->wrappedBulk;
     }
 
     /**
-     * @inheritdoc
+     * @return ObjectID[]|mixed[]
      */
     public function getInsertedIds()
     {

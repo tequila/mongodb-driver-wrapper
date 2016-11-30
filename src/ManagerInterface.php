@@ -10,11 +10,11 @@ interface ManagerInterface
 {
     /**
      * @param string $namespace
-     * @param BulkProviderInterface $bulkWrite
+     * @param BulkCompilerInterface $compiler
      * @param WriteConcern $writeConcern
      * @return WriteResult
      */
-    public function executeBulkWrite($namespace, BulkProviderInterface $bulkWrite, WriteConcern $writeConcern = null);
+    public function executeBulkWrite($namespace, BulkCompilerInterface $compiler, WriteConcern $writeConcern = null);
 
     /**
      * @param string $databaseName
