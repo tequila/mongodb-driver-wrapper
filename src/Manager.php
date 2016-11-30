@@ -81,7 +81,7 @@ class Manager implements ManagerInterface
         $server = $this->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
         $options = $compiler->getOptions($server);
         $bulk = new BulkWrite($options);
-        $compiler->processBulk($bulk, $server);
+        $compiler->compile($bulk, $server);
         $writeResult = $server->executeBulkWrite($namespace, $bulk->getWrappedBulk(), $writeConcern);
         $wrappedResult = new WriteResult($writeResult, $bulk->getInsertedIds());
 

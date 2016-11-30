@@ -15,5 +15,5 @@ interface BulkCompilerInterface
      * @param Server $server
      * @return \MongoDB\Driver\BulkWrite
      */
-    public function processBulk(BulkWrite $bulkWrite, Server $server);
+    public function compile(BulkWrite $bulkWrite, Server $server);
 }
