@@ -2,7 +2,7 @@
 
 namespace Tequila\MongoDB;
 
-class Query implements QueryInterface
+class SimpleQuery implements QueryInterface
 {
     /**
      * @var object

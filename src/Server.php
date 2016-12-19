@@ -4,7 +4,6 @@ namespace Tequila\MongoDB;
 
 use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\Command;
-use MongoDB\Driver\Query;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 
@@ -48,11 +47,11 @@ class Server
 
     /**
      * @param string $namespace
-     * @param Query $query
+     * @param \MongoDB\Driver\Query $query
      * @param ReadPreference|null $readPreference
      * @return \MongoDB\Driver\Cursor
      */
-    public function executeQuery($namespace, Query $query, ReadPreference $readPreference = null)
+    public function executeQuery($namespace, \MongoDB\Driver\Query $query, ReadPreference $readPreference = null)
     {
         return $this->wrappedServer->executeQuery($namespace, $query);
     }
