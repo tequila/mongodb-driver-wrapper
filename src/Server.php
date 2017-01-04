@@ -181,12 +181,4 @@ class Server
     {
         return $this->supportsWireVersion(4);
     }
-
-    /**
-     * @return bool
-     */
-    public function supportsWriteConcern()
-    {
-        return $this->supportsWireVersion(5);
-    }
 }
