@@ -3,7 +3,6 @@
 namespace Tequila\MongoDB;
 
 use MongoDB\Driver\BulkWrite;
-use MongoDB\Driver\Command;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 
@@ -36,11 +35,11 @@ class Server
 
     /**
      * @param string $databaseName
-     * @param Command $command
+     * @param \MongoDB\Driver\Command $command
      * @param ReadPreference|null $readPreference
      * @return \MongoDB\Driver\Cursor
      */
-    public function executeCommand($databaseName, Command $command, ReadPreference $readPreference = null)
+    public function executeCommand($databaseName, \MongoDB\Driver\Command $command, ReadPreference $readPreference = null)
     {
         return $this->wrappedServer->executeCommand($databaseName, $command);
     }
