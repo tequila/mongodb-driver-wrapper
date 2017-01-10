@@ -15,6 +15,11 @@ class Cursor implements CursorInterface
      * @var \Generator
      */
     private $generator;
+    
+    /**
+     * @var bool
+     */
+    private $iterationStarted = false;
 
     /**
      * @param \MongoDB\Driver\Cursor $wrappedCursor
@@ -42,9 +47,10 @@ class Cursor implements CursorInterface
 
     public function rewind()
     {
-        if (!$this->generator->valid()) {
+        if ($this->iterationStarted) {
             throw new LogicException('Cursors cannot yield multiple iterators');
         }
+        $this->iterationStarted = true;
     }
 
     public function valid()
