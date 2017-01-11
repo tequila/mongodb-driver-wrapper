@@ -4,13 +4,16 @@ namespace Tequila\MongoDB;
 
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\Serializable;
+use Tequila\MongoDB\Exception\BadMethodCallException;
+use Tequila\MongoDB\Exception\InvalidArgumentException;
+use Tequila\MongoDB\Exception\UnsupportedException;
 
 class BulkWrite
 {
     /**
-     * @var int
+     * @var int position of the currently compiled write model
      */
-    private $count = 0;
+    private $currentPosition = 0;
 
     /**
      * @var array
@@ -18,33 +21,81 @@ class BulkWrite
     private $insertedIds = [];
 
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * @var \MongoDB\Driver\BulkWrite
      */
     private $wrappedBulk;
 
     /**
+     * @var Server
+     */
+    private $server;
+
+    /**
+     * @var array
+     */
+    private $writeModels;
+
+    /**
+     * @param array $writeModels
      * @param array $options
      */
-    public function __construct(array $options = [])
+    public function __construct(array $writeModels, array $options = [])
     {
-        $this->wrappedBulk = new \MongoDB\Driver\BulkWrite($options);
+        if (empty($writeModels)) {
+            throw new InvalidArgumentException('$writeModels array cannot be empty.');
+        }
+
+        $this->writeModels = $writeModels;
+        $this->options = $options;
+    }
+
+    /**
+     * @param Server $server
+     * @return \MongoDB\Driver\BulkWrite
+     */
+    public function compile(Server $server)
+    {
+        $this->server = $server;
+
+        $expectedPosition = 0;
+        foreach ($this->writeModels as $position => $writeModel) {
+            if (!$expectedPosition === $position) {
+                throw new InvalidArgumentException(
+                    sprintf('$writeModels is not a list. Unexpected index "%s".', $position)
+                );
+            }
+
+            ++$expectedPosition;
+
+            if (!$writeModel instanceof WriteModelInterface) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Each write model must be an instance of "%s", "%s" given in $writeModels[%d].',
+                        WriteModelInterface::class,
+                        is_object($writeModel) ? get_class($writeModel) : gettype($writeModel),
+                        $position
+                    )
+                );
+            }
+
+            $writeModel->writeToBulk($this);
+        }
+
+        return $this->wrappedBulk;
     }
 
     public function __debugInfo()
     {
         return [
-            'count' => $this->count,
+            'count' => $this->currentPosition,
             'insertedIds' => $this->insertedIds,
             'wrappedBulk' => $this->wrappedBulk,
         ];
-    }
-
-    /**
-     * @return \MongoDB\Driver\BulkWrite
-     */
-    public function getWrappedBulk()
-    {
-        return $this->wrappedBulk;
     }
 
     /**
@@ -63,13 +114,15 @@ class BulkWrite
      */
     public function insert($document)
     {
-        $id = $this->wrappedBulk->insert($document);
+        $this->ensureAllowedMethodCall(__METHOD__);
+
+        $id = $this->getWrappedBulk()->insert($document);
         if (null === $id) {
             $id = $this->extractIdFromDocument($document);
         }
 
-        $this->insertedIds[$this->count] = $id;
-        $this->count +=1 ;
+        $this->insertedIds[$this->currentPosition] = $id;
+        $this->currentPosition += 1 ;
 
         return $id;
     }
@@ -83,8 +136,16 @@ class BulkWrite
      */
     public function update($filter, $update, array $options = [])
     {
-        $this->wrappedBulk->update($filter, $update, $options);
-        $this->count += 1;
+        $this->ensureAllowedMethodCall(__METHOD__);
+
+        if (isset($options['collation']) && !$this->server->supportsCollation()) {
+            throw new UnsupportedException(
+                'Option "collation" is not supported by the server.'
+            );
+        }
+
+        $this->getWrappedBulk()->update($filter, $update, $options);
+        $this->currentPosition += 1;
     }
 
     /**
@@ -95,8 +156,16 @@ class BulkWrite
      */
     public function delete($filter, array $options = [])
     {
-        $this->wrappedBulk->delete($filter, $options);
-        $this->count += 1;
+        $this->ensureAllowedMethodCall(__METHOD__);
+
+        if (isset($options['collation']) && !$this->server->supportsCollation()) {
+            throw new UnsupportedException(
+                'Option "collation" is not supported by the server.'
+            );
+        }
+
+        $this->getWrappedBulk()->delete($filter, $options);
+        $this->currentPosition += 1;
     }
 
     /**
@@ -104,19 +173,47 @@ class BulkWrite
      */
     public function count()
     {
-        return $this->count;
+        return count($this->writeModels);
     }
 
     /**
      * @param array|object $document
      * @return ObjectID|mixed
      */
-    private function extractIdFromDocument($document)
+    private function extractIdFromDocument(&$document)
     {
         if ($document instanceof Serializable) {
             return self::extractIdFromDocument($document->bsonSerialize());
         }
 
         return is_array($document) ? $document['_id'] : $document->_id;
+    }
+
+    /**
+     * @return \MongoDB\Driver\BulkWrite
+     */
+    private function getWrappedBulk()
+    {
+        if (null === $this->wrappedBulk) {
+            if (isset($this->options['bypassDocumentValidation']) && !$this->server->supportsDocumentValidation()) {
+                throw new UnsupportedException(
+                    'Option "bypassDocumentValidation" is not supported by the server.'
+                );
+            }
+
+            $this->wrappedBulk = new \MongoDB\Driver\BulkWrite($this->options);
+        }
+
+        return $this->wrappedBulk;
+    }
+
+    private function ensureAllowedMethodCall($method)
+    {
+        // If method called not in compilation stage
+        if (null === $this->server) {
+            throw new BadMethodCallException(
+                sprintf('Method "%s" is internal and should not be called explicitly.', $method)
+            );
+        }
     }
 }

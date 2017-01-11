@@ -2,7 +2,6 @@
 
 namespace Tequila\MongoDB;
 
-use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 
@@ -23,7 +22,7 @@ class Server
 
     public function executeBulkWrite(
         $namespace,
-        BulkWrite $bulkWrite,
+        \MongoDB\Driver\BulkWrite $bulkWrite,
         WriteConcern $writeConcern = null
     ) {
         return $this->wrappedServer->executeBulkWrite(
