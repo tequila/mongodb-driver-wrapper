@@ -50,6 +50,21 @@ class BulkWrite
             throw new InvalidArgumentException('$writeModels array cannot be empty.');
         }
 
+        $allowedOptions = ['bypassDocumentValidation', 'ordered'];
+
+        $unexpectedOptions = array_diff_key($options, array_flip($allowedOptions));
+        if (count($unexpectedOptions)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    (count($unexpectedOptions) > 1
+                        ? 'The options "%s" do not exist.'
+                        : 'The option "%s" does not exist.').' Defined options are: "%s".',
+                    implode('", "', array_keys($unexpectedOptions)),
+                    implode('", "', array_keys($allowedOptions))
+                )
+            );
+        }
+
         $this->writeModels = $writeModels;
         $this->options = $options;
     }
@@ -122,7 +137,7 @@ class BulkWrite
         }
 
         $this->insertedIds[$this->currentPosition] = $id;
-        $this->currentPosition += 1 ;
+        $this->currentPosition += 1;
 
         return $id;
     }
