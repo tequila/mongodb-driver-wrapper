@@ -77,7 +77,7 @@ class BulkWrite
                     sprintf(
                         'Each write model must be an instance of "%s", "%s" given in $writeModels[%d].',
                         WriteModelInterface::class,
-                        is_object($writeModel) ? get_class($writeModel) : gettype($writeModel),
+                        is_object($writeModel) ? get_class($writeModel) : \gettype($writeModel),
                         $position
                     )
                 );
