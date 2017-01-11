@@ -2,7 +2,6 @@
 
 namespace Tequila\MongoDB;
 
-use MongoDB\Driver\Command;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 
@@ -12,7 +11,7 @@ use MongoDB\Driver\WriteConcern;
  * for example, in order to dispatch events.
  * Also this class can be used to create mocks, when you need to test, what methods of the Manager will be called
  */
-class Manager implements ManagerInterface
+class Manager
 {
     /**
      * @var string
@@ -75,15 +74,12 @@ class Manager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function executeBulkWrite($namespace, BulkCompilerInterface $compiler, WriteConcern $writeConcern = null)
+    public function executeBulkWrite($namespace, BulkWrite $bulkWrite, WriteConcern $writeConcern = null)
     {
         $writeConcern = $writeConcern ?: $this->getWriteConcern();
         $server = $this->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
-        $options = $compiler->getOptions($server);
-        $bulk = new BulkWrite($options);
-        $compiler->compile($bulk, $server);
-        $writeResult = $server->executeBulkWrite($namespace, $bulk->getWrappedBulk(), $writeConcern);
-        $wrappedResult = new WriteResult($writeResult, $bulk->getInsertedIds());
+        $writeResult = $server->executeBulkWrite($namespace, $bulkWrite->compile($server), $writeConcern);
+        $wrappedResult = new WriteResult($writeResult, $bulkWrite->getInsertedIds());
 
         return $wrappedResult;
     }
@@ -95,7 +91,7 @@ class Manager implements ManagerInterface
     {
         $readPreference = $readPreference ?: $this->getReadPreference();
         $server = $this->selectServer($readPreference);
-        $driverCommand = new Command($command->getOptions($server));
+        $driverCommand = new \MongoDB\Driver\Command($command->getOptions($server));
 
         $cursor = $server->executeCommand(
             $databaseName,

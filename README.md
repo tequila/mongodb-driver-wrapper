@@ -130,9 +130,8 @@ Off course, you can decorate every single command or write your own commands. Bu
 if you need to write everything by yourself. It's too hard and it leads to bugs: if you change your profiler, you must
 fix it's usages in every single command.
 Therefore, the best solution is to have ability to add your logic right before the request is sent to the database.
-By accepting `Tequila\MongoDB\ManagerInterface` in your methods, you can achieve this goal very easy:
-just write your own `Manager` class, which implements this interface and has some custom logic, or just extend
-`Tequila\MongoDB\Manager` class and decorate one of it's three main methods to intercept database request:
+By accepting `Tequila\MongoDB\Manager` in your methods, you can achieve this goal very easy:
+just extend `Tequila\MongoDB\Manager` class and decorate one of it's three main methods to intercept database request:
 
 ```php
 <?php
