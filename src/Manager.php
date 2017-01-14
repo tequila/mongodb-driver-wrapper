@@ -76,7 +76,6 @@ class Manager
      */
     public function executeBulkWrite($namespace, BulkWrite $bulkWrite, WriteConcern $writeConcern = null)
     {
-        $writeConcern = $writeConcern ?: $this->getWriteConcern();
         $server = $this->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
         $writeResult = $server->executeBulkWrite($namespace, $bulkWrite->compile($server), $writeConcern);
         $wrappedResult = new WriteResult($writeResult, $bulkWrite->getInsertedIds());
