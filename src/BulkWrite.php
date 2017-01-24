@@ -36,18 +36,18 @@ class BulkWrite
     private $server;
 
     /**
-     * @var array
+     * @var WriteModelInterface[]|\Traversable
      */
     private $writeModels;
 
     /**
-     * @param array $writeModels
+     * @param WriteModelInterface[]|\Traversable $writeModels
      * @param array $options
      */
-    public function __construct(array $writeModels, array $options = [])
+    public function __construct($writeModels, array $options = [])
     {
-        if (empty($writeModels)) {
-            throw new InvalidArgumentException('$writeModels array cannot be empty.');
+        if (is_array($writeModels) && empty($writeModels)) {
+            throw new InvalidArgumentException('$writeModels array is empty.');
         }
 
         $allowedOptions = ['bypassDocumentValidation', 'ordered'];
@@ -85,8 +85,6 @@ class BulkWrite
                 );
             }
 
-            ++$expectedPosition;
-
             if (!$writeModel instanceof WriteModelInterface) {
                 throw new InvalidArgumentException(
                     sprintf(
@@ -99,6 +97,11 @@ class BulkWrite
             }
 
             $writeModel->writeToBulk($this);
+            ++$expectedPosition;
+        }
+
+        if (0 === $expectedPosition) {
+            throw new InvalidArgumentException('$writeModels iterator is empty.');
         }
 
         return $this->wrappedBulk;
