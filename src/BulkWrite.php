@@ -46,6 +46,12 @@ class BulkWrite
      */
     public function __construct($writeModels, array $options = [])
     {
+        if (!is_array($writeModels) && !$writeModels instanceof \Traversable) {
+            throw new InvalidArgumentException(
+                '$writeModels must be an array or a \Traversable instance.'
+            );
+        }
+
         if (is_array($writeModels) && empty($writeModels)) {
             throw new InvalidArgumentException('$writeModels array is empty.');
         }
