@@ -42,7 +42,8 @@ class Manager
      */
     public function __construct($uri = 'mongodb://127.0.0.1/', array $uriOptions = [], array $driverOptions = [])
     {
-        // Sorting options forces wrapped \MongoDB\Driver\Manager to reuse cached libmongoc connections
+        // Sorting options forces two \MongoDB\Driver\Manager with the same options to be "equal".
+        // This allows to reuse cached libmongoc connections
         ksort($uriOptions);
         ksort($driverOptions);
 

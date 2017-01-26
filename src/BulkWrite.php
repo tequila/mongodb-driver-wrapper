@@ -11,6 +11,16 @@ use Tequila\MongoDB\Exception\UnsupportedException;
 class BulkWrite
 {
     /**
+     * @var BulkWriteListenerInterface
+     */
+    private $listener;
+
+    /**
+     * @var bool
+     */
+    private $isCompilationStage = false;
+
+    /**
      * @var int position of the currently compiled write model
      */
     private $currentPosition = 0;
@@ -81,6 +91,7 @@ class BulkWrite
      */
     public function compile(Server $server)
     {
+        $this->isCompilationStage = true;
         $this->server = $server;
 
         $expectedPosition = 0;
@@ -109,6 +120,8 @@ class BulkWrite
         if (0 === $expectedPosition) {
             throw new InvalidArgumentException('$writeModels iterator is empty.');
         }
+
+        $this->isCompilationStage = false;
 
         return $this->wrappedBulk;
     }
@@ -140,6 +153,10 @@ class BulkWrite
     {
         $this->ensureAllowedMethodCall(__METHOD__);
 
+        if (null !== $this->listener) {
+            $this->listener->onInsert($document);
+        }
+
         $id = $this->getWrappedBulk()->insert($document);
         if (null === $id) {
             $id = $this->extractIdFromDocument($document);
@@ -168,6 +185,10 @@ class BulkWrite
             );
         }
 
+        if (null !== $this->listener) {
+            $this->listener->onUpdate($filter, $update, $options);
+        }
+
         $this->getWrappedBulk()->update($filter, $update, $options);
         $this->currentPosition += 1;
     }
@@ -188,6 +209,10 @@ class BulkWrite
             );
         }
 
+        if (null !== $this->listener) {
+            $this->listener->onDelete($filter, $options);
+        }
+
         $this->getWrappedBulk()->delete($filter, $options);
         $this->currentPosition += 1;
     }
@@ -198,6 +223,14 @@ class BulkWrite
     public function count()
     {
         return count($this->writeModels);
+    }
+
+    /**
+     * @param BulkWriteListenerInterface $listener
+     */
+    public function setListener(BulkWriteListenerInterface $listener)
+    {
+        $this->listener = $listener;
     }
 
     /**
@@ -231,12 +264,15 @@ class BulkWrite
         return $this->wrappedBulk;
     }
 
-    private function ensureAllowedMethodCall($method)
+    private function ensureAllowedMethodCall($methodName)
     {
         // If method called not in compilation stage
-        if (null === $this->server) {
+        if (false === $this->isCompilationStage) {
             throw new BadMethodCallException(
-                sprintf('Method "%s" is internal and should not be called explicitly.', $method)
+                sprintf(
+                    'Method "%s" is internal and can be called only during bulk compilation process.',
+                    $methodName
+                )
             );
         }
     }
