@@ -34,6 +34,11 @@ class Manager
     private $wrappedManager;
 
     /**
+     * @var OperationListenerInterface
+     */
+    private $operationListener;
+
+    /**
      * Wraps @see \MongoDB\Driver\Manager::__construct()
      *
      * @param string $uri
@@ -78,7 +83,14 @@ class Manager
     public function executeBulkWrite($namespace, BulkWrite $bulkWrite, WriteConcern $writeConcern = null)
     {
         $server = $this->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
+        if (null !== $this->operationListener) {
+            $this->operationListener->beforeBulkWrite($server, $namespace, $bulkWrite);
+        }
         $writeResult = $server->executeBulkWrite($namespace, $bulkWrite->compile($server), $writeConcern);
+        if (null !== $this->operationListener) {
+            $this->operationListener->afterBulkWrite($server, $namespace, $bulkWrite);
+        }
+
         $wrappedResult = new WriteResult($writeResult, $bulkWrite->getInsertedIds());
 
         return $wrappedResult;
@@ -91,14 +103,26 @@ class Manager
     {
         $readPreference = $readPreference ?: $this->getReadPreference();
         $server = $this->selectServer($readPreference);
-        $driverCommand = new \MongoDB\Driver\Command($command->getOptions($server));
+        $commandOptions = $command->getOptions($server);
+
+        if (null !== $this->operationListener) {
+            $this->operationListener->beforeCommand($server, $databaseName, $commandOptions);
+        }
+
+        $driverCommand = new \MongoDB\Driver\Command($commandOptions);
 
         $cursor = $server->executeCommand(
             $databaseName,
             $driverCommand
         );
 
-        return new Cursor($cursor);
+        $cursor = new Cursor($cursor);
+
+        if (null !== $this->operationListener) {
+            $this->operationListener->afterCommand($server, $databaseName, $commandOptions, $cursor);
+        }
+
+        return $cursor;
     }
 
     /**
@@ -109,14 +133,26 @@ class Manager
         $readPreference = $readPreference ?: $this->getReadPreference();
 
         $server = $this->selectServer($readPreference);
+        $queryOptions = $query->getOptions($server);
+
+        if (null !== $this->operationListener) {
+            $this->operationListener->beforeQuery($server, $namespace, $query->getFilter(), $queryOptions);
+        }
+
         $driverQuery = new \MongoDB\Driver\Query(
             $query->getFilter(),
-            $query->getOptions($server)
+            $queryOptions
         );
 
         $cursor = $server->executeQuery($namespace, $driverQuery);
 
-        return new Cursor($cursor);
+        $cursor = new Cursor($cursor);
+
+        if (null !== $this->operationListener) {
+            $this->operationListener->afterQuery($server, $namespace, $query->getFilter(), $queryOptions, $cursor);
+        }
+
+        return $cursor;
     }
 
     /**
@@ -164,5 +200,13 @@ class Manager
         $server = $this->wrappedManager->selectServer($readPreference);
 
         return new Server($server);
+    }
+
+    /**
+     * @param OperationListenerInterface $listener
+     */
+    public function setOperationListener(OperationListenerInterface $listener)
+    {
+        $this->operationListener = $listener;
     }
 }

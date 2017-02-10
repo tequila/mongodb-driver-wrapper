@@ -8,17 +8,17 @@ interface BulkWriteListenerInterface
      * @param array|object $filter
      * @param array $options
      */
-    public function onDelete($filter, array $options = []);
+    public function beforeDelete($filter, array $options = []);
 
     /**
      * @param array|object $document
      */
-    public function onInsert($document);
+    public function beforeInsert($document);
 
     /**
      * @param array|object $filter
      * @param array|object $update
      * @param array $options
      */
-    public function onUpdate($filter, $update, array $options = []);
+    public function beforeUpdate($filter, $update, array $options = []);
 }

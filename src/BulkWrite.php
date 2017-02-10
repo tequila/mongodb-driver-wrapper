@@ -154,7 +154,7 @@ class BulkWrite
         $this->ensureAllowedMethodCall(__METHOD__);
 
         if (null !== $this->listener) {
-            $this->listener->onInsert($document);
+            $this->listener->beforeInsert($document);
         }
 
         $id = $this->getWrappedBulk()->insert($document);
@@ -186,7 +186,7 @@ class BulkWrite
         }
 
         if (null !== $this->listener) {
-            $this->listener->onUpdate($filter, $update, $options);
+            $this->listener->beforeUpdate($filter, $update, $options);
         }
 
         $this->getWrappedBulk()->update($filter, $update, $options);
@@ -210,7 +210,7 @@ class BulkWrite
         }
 
         if (null !== $this->listener) {
-            $this->listener->onDelete($filter, $options);
+            $this->listener->beforeDelete($filter, $options);
         }
 
         $this->getWrappedBulk()->delete($filter, $options);

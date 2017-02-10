@@ -22,6 +22,11 @@ class Cursor implements CursorInterface
     private $iterationStarted = false;
 
     /**
+     * @var DocumentListenerInterface|null
+     */
+    private $documentListener;
+
+    /**
      * @param \MongoDB\Driver\Cursor $wrappedCursor
      */
     public function __construct(\MongoDB\Driver\Cursor $wrappedCursor)
@@ -43,6 +48,14 @@ class Cursor implements CursorInterface
     public function next()
     {
         $this->generator->next();
+
+        $document = $this->current();
+
+        if (null !== $this->documentListener) {
+            $this->documentListener->onDocument($document);
+        }
+
+        return $document;
     }
 
     public function rewind()
@@ -88,6 +101,14 @@ class Cursor implements CursorInterface
     public function setTypeMap(array $typeMap)
     {
         $this->wrappedCursor->setTypeMap($typeMap);
+    }
+
+    /**
+     * @param DocumentListenerInterface $listener
+     */
+    public function setDocumentListener(DocumentListenerInterface $listener)
+    {
+        $this->documentListener = $listener;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Tequila\MongoDB;
 
-interface QueryInterface extends OptionsProviderInterface
+interface QueryInterface
 {
     const CURSOR_NON_TAILABLE = 1;
     const CURSOR_TAILABLE = 2;
@@ -12,4 +12,10 @@ interface QueryInterface extends OptionsProviderInterface
      * @return array|object
      */
     public function getFilter();
+
+    /**
+     * @param Server $server is passed to resolve query options depending on server version
+     * @return array|object
+     */
+    public function getOptions(Server $server);
 }

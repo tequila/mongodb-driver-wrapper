@@ -29,4 +29,9 @@ interface CursorInterface extends \Iterator
      * @return array
      */
     public function toArray();
+
+    /**
+     * @param DocumentListenerInterface $listener
+     */
+    public function setDocumentListener(DocumentListenerInterface $listener);
 }
