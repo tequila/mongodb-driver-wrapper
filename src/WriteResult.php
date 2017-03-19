@@ -12,6 +12,8 @@ use Tequila\MongoDB\Exception\BadMethodCallException;
  */
 class WriteResult
 {
+    use ExecutionTimeTrait;
+
     /**
      * @var WriteResult
      */

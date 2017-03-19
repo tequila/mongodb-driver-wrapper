@@ -4,8 +4,10 @@ namespace Tequila\MongoDB;
 
 use Tequila\MongoDB\Exception\LogicException;
 
-class Cursor implements CursorInterface
+class Cursor implements \Iterator
 {
+    use ExecutionTimeTrait;
+
     /**
      * @var \MongoDB\Driver\Cursor
      */
@@ -35,16 +37,25 @@ class Cursor implements CursorInterface
         $this->generator = $this->createGenerator();
     }
 
+    /**
+     * @return array|object|\MongoDB\BSON\Unserializable
+     */
     public function current()
     {
         return $this->generator->current();
     }
 
+    /**
+     * @return int
+     */
     public function key()
     {
         return $this->generator->key();
     }
 
+    /**
+     * @return array|\MongoDB\BSON\Unserializable|object
+     */
     public function next()
     {
         $this->generator->next();

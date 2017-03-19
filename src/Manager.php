@@ -34,9 +34,9 @@ class Manager
     private $wrappedManager;
 
     /**
-     * @var OperationListenerInterface
+     * @var bool
      */
-    private $operationListener;
+    private $timerEnabled = false;
 
     /**
      * Wraps @see \MongoDB\Driver\Manager::__construct()
@@ -83,17 +83,17 @@ class Manager
     public function executeBulkWrite($namespace, BulkWrite $bulkWrite, WriteConcern $writeConcern = null)
     {
         $server = $this->selectServer(new ReadPreference(ReadPreference::RP_PRIMARY));
-        if (null !== $this->operationListener) {
-            $this->operationListener->beforeBulkWrite($server, $namespace, $bulkWrite);
+        if ($this->timerEnabled) {
+            $startTime = round(microtime(true) * 1000);
         }
         $writeResult = $server->executeBulkWrite($namespace, $bulkWrite->compile($server), $writeConcern);
-        if (null !== $this->operationListener) {
-            $this->operationListener->afterBulkWrite($server, $namespace, $bulkWrite);
+        $writeResult = new WriteResult($writeResult, $bulkWrite->getInsertedIds());
+        if ($this->timerEnabled) {
+            /** @var int $startTime */
+            $writeResult->setExecutionTimeMS(round(microtime(true) * 1000) - $startTime);
         }
 
-        $wrappedResult = new WriteResult($writeResult, $bulkWrite->getInsertedIds());
-
-        return $wrappedResult;
+        return $writeResult;
     }
 
     /**
@@ -105,21 +105,20 @@ class Manager
         $server = $this->selectServer($readPreference);
         $commandOptions = $command->getOptions($server);
 
-        if (null !== $this->operationListener) {
-            $this->operationListener->beforeCommand($server, $databaseName, $commandOptions);
-        }
-
         $driverCommand = new \MongoDB\Driver\Command($commandOptions);
 
+        if ($this->timerEnabled) {
+            $startTime = round(microtime(true) * 1000);
+        }
         $cursor = $server->executeCommand(
             $databaseName,
             $driverCommand
         );
-
         $cursor = new Cursor($cursor);
 
-        if (null !== $this->operationListener) {
-            $this->operationListener->afterCommand($server, $databaseName, $commandOptions, $cursor);
+        if ($this->timerEnabled) {
+            /** @var int $startTime */
+            $cursor->setExecutionTimeMS(round(microtime(true) * 1000) - $startTime);
         }
 
         return $cursor;
@@ -135,24 +134,41 @@ class Manager
         $server = $this->selectServer($readPreference);
         $queryOptions = $query->getOptions($server);
 
-        if (null !== $this->operationListener) {
-            $this->operationListener->beforeQuery($server, $namespace, $query->getFilter(), $queryOptions);
-        }
-
         $driverQuery = new \MongoDB\Driver\Query(
             $query->getFilter(),
             $queryOptions
         );
 
+        if ($this->timerEnabled) {
+            $startTime = round(microtime(true) * 1000);
+        }
         $cursor = $server->executeQuery($namespace, $driverQuery);
-
         $cursor = new Cursor($cursor);
-
-        if (null !== $this->operationListener) {
-            $this->operationListener->afterQuery($server, $namespace, $query->getFilter(), $queryOptions, $cursor);
+        if ($this->timerEnabled) {
+            /** @var int $startTime */
+            $cursor->setExecutionTimeMS(round(microtime(true) * 1000) - $startTime);
         }
 
         return $cursor;
+    }
+
+    /**
+     * Enables the timer for queries, commands and bulk writes.
+     * When timer is enabled, cursors and WriteResult instances will contain an information
+     * about execution time
+     * @void
+     */
+    public function enableTimer()
+    {
+        $this->timerEnabled = true;
+    }
+
+    /**
+     * Disables the timer for queries, commands and bulk writes. @see enableTimer()
+     */
+    public function disableTimer()
+    {
+        $this->timerEnabled = false;
     }
 
     /**
@@ -200,13 +216,5 @@ class Manager
         $server = $this->wrappedManager->selectServer($readPreference);
 
         return new Server($server);
-    }
-
-    /**
-     * @param OperationListenerInterface $listener
-     */
-    public function setOperationListener(OperationListenerInterface $listener)
-    {
-        $this->operationListener = $listener;
     }
 }
