@@ -63,7 +63,7 @@ class Cursor implements \Iterator
         $document = $this->current();
 
         if (null !== $this->documentListener) {
-            $this->documentListener->onDocument($document);
+            $this->documentListener->onDocument($this, $document);
         }
 
         return $document;

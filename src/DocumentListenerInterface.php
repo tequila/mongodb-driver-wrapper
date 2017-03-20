@@ -4,5 +4,9 @@ namespace Tequila\MongoDB;
 
 interface DocumentListenerInterface
 {
-    public function onDocument($document);
+    /**
+     * @param Cursor $cursor
+     * @param array|object|\MongoDB\BSON\Unserializable $document
+     */
+    public function onDocument(Cursor $cursor, $document);
 }
