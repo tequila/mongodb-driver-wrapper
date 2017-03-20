@@ -39,6 +39,11 @@ class Manager
     private $timerEnabled = false;
 
     /**
+     * @var QueryListenerInterface[]
+     */
+    private $queryListeners = [];
+
+    /**
      * Wraps @see \MongoDB\Driver\Manager::__construct()
      *
      * @param string $uri
@@ -60,6 +65,14 @@ class Manager
             $this->uriOptions,
             $this->driverOptions
         );
+    }
+
+    /**
+     * @param QueryListenerInterface $listener
+     */
+    public function addQueryListener(QueryListenerInterface $listener)
+    {
+        $this->queryListeners[] = $listener;
     }
 
     /**
@@ -147,6 +160,10 @@ class Manager
         if ($this->timerEnabled) {
             /** @var int $startTime */
             $cursor->setExecutionTimeMS(round(microtime(true) * 1000) - $startTime);
+        }
+
+        foreach ($this->queryListeners as $listener) {
+            $listener->onQueryExecuted($namespace, $query->getFilter(), $queryOptions, $cursor);
         }
 
         return $cursor;
