@@ -1,6 +1,6 @@
 <?php
 
-namespace Tequila\MongoDB;
+namespace Tequila\MongoDB\Traits;
 
 trait ExecutionTimeTrait
 {
