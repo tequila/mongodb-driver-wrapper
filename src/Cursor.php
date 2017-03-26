@@ -6,7 +6,7 @@ use Tequila\MongoDB\Exception\LogicException;
 
 class Cursor implements \Iterator
 {
-    use ExecutionTimeTrait;
+    use Traits\ExecutionTimeTrait;
 
     /**
      * @var \MongoDB\Driver\Cursor
