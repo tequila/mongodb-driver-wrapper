@@ -6,6 +6,7 @@ use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\Serializable;
 use Tequila\MongoDB\Exception\BadMethodCallException;
 use Tequila\MongoDB\Exception\InvalidArgumentException;
+use Tequila\MongoDB\Exception\LogicException;
 use Tequila\MongoDB\Exception\UnsupportedException;
 
 class BulkWrite
@@ -159,7 +160,20 @@ class BulkWrite
 
         $id = $this->getWrappedBulk()->insert($document);
         if (null === $id) {
+            if ($document instanceof DocumentInterface && !$document->getId()) {
+                throw new LogicException(
+                    '$document contains an id, but it\'s method getId() does not return it.'
+                );
+            }
+
             $id = $this->extractIdFromDocument($document);
+        } else if ($document instanceof DocumentInterface) {
+            if ($document->getId()) {
+                throw new LogicException(
+                    '$document\'s method getId() returns not the same id document will be inserted with.'
+                );
+            }
+            $document->setId($id);
         }
 
         $this->insertedIds[$this->currentPosition] = $id;
