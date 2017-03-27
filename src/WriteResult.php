@@ -161,7 +161,7 @@ class WriteResult
         if (!$this->acknowledged) {
             throw new BadMethodCallException(
                 sprintf(
-                    'Method %s cannot be called on unacknowledged write result',
+                    'Method %s cannot be called on unacknowledged write result.',
                     $method
                 )
             );
