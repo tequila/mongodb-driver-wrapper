@@ -8,7 +8,7 @@ interface QueryListenerInterface
      * @param string $namespace
      * @param array|object $filter
      * @param array $options
-     * @param Cursor $cursor
+     * @param QueryCursor $cursor
      */
-    public function onQueryExecuted($namespace, $filter, array $options, Cursor $cursor);
+    public function onQueryExecuted($namespace, $filter, array $options, QueryCursor $cursor);
 }

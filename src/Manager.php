@@ -91,7 +91,10 @@ class Manager
     }
 
     /**
-     * @inheritdoc
+     * @param string $namespace
+     * @param BulkWrite $bulkWrite
+     * @param WriteConcern|null $writeConcern
+     * @return \MongoDB\Driver\WriteResult|WriteResult
      */
     public function executeBulkWrite($namespace, BulkWrite $bulkWrite, WriteConcern $writeConcern = null)
     {
@@ -110,7 +113,10 @@ class Manager
     }
 
     /**
-     * @inheritdoc
+     * @param string $databaseName
+     * @param CommandInterface $command
+     * @param ReadPreference|null $readPreference
+     * @return CommandCursor
      */
     public function executeCommand($databaseName, CommandInterface $command, ReadPreference $readPreference = null)
     {
@@ -127,7 +133,7 @@ class Manager
             $databaseName,
             $driverCommand
         );
-        $cursor = new Cursor($cursor);
+        $cursor = new CommandCursor($cursor);
 
         if ($this->timerEnabled) {
             /** @var int $startTime */
@@ -138,7 +144,10 @@ class Manager
     }
 
     /**
-     * @inheritdoc
+     * @param string $namespace
+     * @param QueryInterface $query
+     * @param ReadPreference|null $readPreference
+     * @return QueryCursor
      */
     public function executeQuery($namespace, QueryInterface $query, ReadPreference $readPreference = null)
     {
@@ -156,11 +165,12 @@ class Manager
             $startTime = round(microtime(true) * 1000);
         }
         $cursor = $server->executeQuery($namespace, $driverQuery);
-        $cursor = new Cursor($cursor);
+        $cursor = new QueryCursor($cursor);
         if ($this->timerEnabled) {
             /** @var int $startTime */
             $cursor->setExecutionTimeMS(round(microtime(true) * 1000) - $startTime);
         }
+        $cursor->setNamespace($namespace);
 
         foreach ($this->queryListeners as $listener) {
             $listener->onQueryExecuted($namespace, $query->getFilter(), $queryOptions, $cursor);
