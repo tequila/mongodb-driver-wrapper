@@ -24,6 +24,11 @@ class Cursor implements \Iterator
     private $iterationStarted = false;
 
     /**
+     * @var array|null
+     */
+    private $typeMap;
+
+    /**
      * @param \MongoDB\Driver\Cursor $wrappedCursor
      */
     public function __construct(\MongoDB\Driver\Cursor $wrappedCursor)
@@ -102,10 +107,19 @@ class Cursor implements \Iterator
     }
 
     /**
+     * @return array|null
+     */
+    public function getTypeMap()
+    {
+        return $this->typeMap;
+    }
+
+    /**
      * @inheritdoc
      */
     public function setTypeMap(array $typeMap)
     {
+        $this->typeMap = $typeMap;
         $this->wrappedCursor->setTypeMap($typeMap);
     }
 
