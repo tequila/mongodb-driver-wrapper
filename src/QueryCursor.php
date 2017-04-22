@@ -2,6 +2,8 @@
 
 namespace Tequila\MongoDB;
 
+use MongoDB\BSON\Unserializable;
+
 class QueryCursor extends Cursor
 {
     /**
@@ -15,14 +17,20 @@ class QueryCursor extends Cursor
     private $namespace;
 
     /**
+     * @var bool|object|array|Unserializable
+     */
+    private $current = false;
+
+    /**
      * @inheritdoc
      */
-    public function next()
+    public function current()
     {
-        $document = parent::next();
-        if (null !== $this->documentListener) {
+        $document = parent::current();
+        if (null !== $this->documentListener && $document !== $this->current) {
             $this->documentListener->onDocument($this, $document);
         }
+        $this->current = $document;
 
         return $document;
     }
