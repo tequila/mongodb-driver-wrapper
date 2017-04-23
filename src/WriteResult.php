@@ -111,7 +111,7 @@ class WriteResult
     }
 
     /**
-     * @return \MongoDB\BSON\ObjectID
+     * @return \MongoDB\BSON\ObjectID[]
      */
     public function getUpsertedIds()
     {
