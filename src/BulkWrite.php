@@ -145,7 +145,7 @@ class BulkWrite
     }
 
     /**
-     * Wraps @see \MongoDB\Driver\BulkWrite::insert() to save inserted id and always return it
+     * Wraps @see \MongoDB\Driver\BulkWrite::insert() to save inserted id and always return it.
      *
      * @param array|object $document
      * @return ObjectID|mixed id of the inserted document
@@ -167,7 +167,7 @@ class BulkWrite
             }
 
             $id = $this->extractIdFromDocument($document);
-        } else if ($document instanceof DocumentInterface) {
+        } elseif ($document instanceof DocumentInterface) {
             if ($document->getId()) {
                 throw new LogicException(
                     '$document\'s method getId() returns not the same id document will be inserted with.'
@@ -183,7 +183,7 @@ class BulkWrite
     }
 
     /**
-     * Wraps @see \MongoDB\Driver\BulkWrite::update()
+     * Wraps @see \MongoDB\Driver\BulkWrite::update().
      *
      * @param array|object $filter
      * @param array|object $update
@@ -208,7 +208,7 @@ class BulkWrite
     }
 
     /**
-     * Wraps @see \MongoDB\Driver\BulkWrite::delete()
+     * Wraps @see \MongoDB\Driver\BulkWrite::delete().
      *
      * @param array|object $filter
      * @param array $options
@@ -251,13 +251,15 @@ class BulkWrite
      * @param array|object $document
      * @return ObjectID|mixed
      */
-    private function extractIdFromDocument(&$document)
+    private function extractIdFromDocument($document)
     {
+        $targetDocument = $document;
+
         if ($document instanceof Serializable) {
-            return self::extractIdFromDocument($document->bsonSerialize());
+            $targetDocument = $this->extractIdFromDocument($document->bsonSerialize());
         }
 
-        return is_array($document) ? $document['_id'] : $document->_id;
+        return is_array($targetDocument) ? $targetDocument['_id'] : $targetDocument->_id;
     }
 
     /**
