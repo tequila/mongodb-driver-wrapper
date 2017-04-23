@@ -256,7 +256,7 @@ class BulkWrite
         $targetDocument = $document;
 
         if ($document instanceof Serializable) {
-            $targetDocument = $this->extractIdFromDocument($document->bsonSerialize());
+            $targetDocument = $document->bsonSerialize();
         }
 
         return is_array($targetDocument) ? $targetDocument['_id'] : $targetDocument->_id;
