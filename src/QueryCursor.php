@@ -7,9 +7,9 @@ use MongoDB\BSON\Unserializable;
 class QueryCursor extends Cursor
 {
     /**
-     * @var DocumentListenerInterface|null
+     * @var DocumentListenerInterface[]
      */
-    private $documentListener;
+    private $documentListeners = [];
 
     /**
      * @var string
@@ -27,10 +27,19 @@ class QueryCursor extends Cursor
     public function current()
     {
         $document = parent::current();
-        if (null !== $this->documentListener && $document !== $this->current) {
-            $this->documentListener->onDocument($this, $document);
+        if ($document && $document !== $this->current) {
+            $decoratedDocument = null;
+            foreach ($this->documentListeners as $listener) {
+                $listenerResult = $listener->onDocument($this, $decoratedDocument ?: $document);
+                $decoratedDocument = $listenerResult ?: $decoratedDocument;
+            }
+
+            $this->current = $document;
+
+            if ($decoratedDocument) {
+                return $decoratedDocument;
+            }
         }
-        $this->current = $document;
 
         return $document;
     }
@@ -38,9 +47,9 @@ class QueryCursor extends Cursor
     /**
      * @param DocumentListenerInterface $listener
      */
-    public function setDocumentListener(DocumentListenerInterface $listener)
+    public function addDocumentListener(DocumentListenerInterface $listener)
     {
-        $this->documentListener = $listener;
+        $this->documentListeners[] = $listener;
     }
 
     /**
